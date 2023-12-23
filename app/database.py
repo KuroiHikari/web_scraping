@@ -25,12 +25,41 @@ class DB:
 
 
     @staticmethod
-    def all():
+    def all(sortBy = None, filters = []):
         conn, cur = DB.__cursor()
+        query = "SELECT * FROM cars"
 
-        cur.execute("SELECT * FROM cars;")
+        whereClauses = []
+        params = []
+        for filter in filters:
+            match filter:
+                case (_, None, None):
+                    continue
+                case (_ None): 
+                    continue
+                case (col, None, max):
+                    whereClauses.append(f"{col} <= %s")
+                    params.append(max)
+                case (col, min, None):
+                    whereClauses.append(f"{col} >= %s")
+                    params.append(min)
+                case (col, min, max):
+                    whereClauses.append(f"{col} >= %s AND {col} <= %s")
+                    params.append(min, max)
+                case (col, like):
+                    whereClauses.append(f"{col} LIKE %s")
+                    params.append(like)
+
+        if whereClauses:
+            query = f"{query} WHERE {" AND ".join(whereClauses)}" 
+
+        if sortBy:
+            query = f"{query} ORDER BY {sortBy[0]} {sortBy[1]}"
+
+        query = f"{query};"
+
+        cur.execute(query)
         res = cur.fetchall()
-        print(res)
         DB.__close(conn, cur)
 
         return [Car.parse_obj(r) for r in res]

@@ -3,7 +3,9 @@ from decimal import Decimal
 
 class Car(BaseModel):
     id: int
-    name: str
+    brand: str
+    typeName: str
+    year: int
     mileage: Decimal
     dealer: str
     rating: Decimal
