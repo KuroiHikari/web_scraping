@@ -4,7 +4,7 @@ from decimal import Decimal
 class Car(BaseModel):
     id: int
     brand: str
-    typeName: str
+    typename: str
     year: int
     mileage: Decimal
     dealer: str

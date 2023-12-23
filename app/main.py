@@ -14,7 +14,7 @@ def read_root():
 @app.get("/cars", response_model=list[Car])
 def get_all(
     brand = None,
-    typeName = None,
+    typename = None,
     year_min = None,
     year_max = None,
     mileage_min = None,
@@ -26,11 +26,12 @@ def get_all(
     reviews_max = None,
     price_min = None,
     price_max = None,
-    sortBy = None
+    sortBy = None,
+    order = "ASC"
 ) -> list[Car]:
     filters = [
         ("brand", brand),
-        ("typeName", typeName),
+        ("typename", typename),
         ("year", year_min, year_max),
         ("mileage", mileage_min, mileage_max),
         ("dealer", dealer),
@@ -40,4 +41,4 @@ def get_all(
     ]
 
 
-    return DB.all(sortBy, filters)
+    return DB.all((sortBy, order), filters)

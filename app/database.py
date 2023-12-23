@@ -31,11 +31,9 @@ class DB:
 
         whereClauses = []
         params = []
-        for filter in filters:
-            match filter:
-                case (_, None, None):
-                    continue
-                case (_ None): 
+        for f in filters:
+            match f:
+                case (_, None) | (_, None, None):
                     continue
                 case (col, None, max):
                     whereClauses.append(f"{col} <= %s")
@@ -51,14 +49,14 @@ class DB:
                     params.append(like)
 
         if whereClauses:
-            query = f"{query} WHERE {" AND ".join(whereClauses)}" 
+            query = f"{query} WHERE {' AND '.join(whereClauses)}" 
 
         if sortBy:
             query = f"{query} ORDER BY {sortBy[0]} {sortBy[1]}"
 
         query = f"{query};"
 
-        cur.execute(query)
+        cur.execute(query, params)
         res = cur.fetchall()
         DB.__close(conn, cur)
 

@@ -1,6 +1,6 @@
 # Cool utility image that makes hot-reload etc. very simple, not good for more serious projects
 # if you're planning on using k8s etc
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 WORKDIR /code/app/
 
 COPY ./requirements.txt /code/requirements.txt

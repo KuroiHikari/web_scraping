@@ -28,3 +28,5 @@ vim temporary files
 
 macOS
 .DS_Store
+
+__pycache__
