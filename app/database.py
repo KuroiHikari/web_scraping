@@ -1,31 +1,49 @@
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from psycopg2 import connect, DatabaseError
+from psycopg2.extensions import connection, cursor
+from psycopg2.extras import RealDictCursor, execute_batch
 from schemas import Car
-from pydantic import parse_obj_as
+from typing import Any, List, Tuple, Literal
 
 DATABASE_URL = "postgresql://postgres:postgres@db/scraper"
 
+Filter = Tuple[str, int | None, int | None] | Tuple[str, str | None]
+Sort = Tuple[str, Literal["ASC", "DESC"]]
+
 class DB:
     @staticmethod
-    def __cursor():
-        conn = psycopg2.connect(
+    def __cursor() -> Tuple[connection, cursor]:
+        conn = connect(
             host="db",
             database="scraper",
             user="postgres",
             password="postgres"
         )
+        return conn, conn.cursor(cursor_factory=RealDictCursor) 
 
-        return conn, conn.cursor(cursor_factory=RealDictCursor)
-
-
-    @staticmethod
-    def __close(conn, cur):
-        cur.close()
+    @staticmethod 
+    def __close(conn: connection, cur: cursor) -> None: 
+        cur.close() 
         conn.close()
 
 
     @staticmethod
-    def all(sortBy = None, filters = []):
+    def import_cars(tuples: List[Tuple[Any, ...]], columns: str) -> None:
+        conn, cursor = DB.__cursor()
+        delete_query = "DELETE FROM cars WHERE 1=1"
+        insert_query = f"INSERT INTO cars({columns}) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)" 
+        try:
+            cursor.execute(delete_query)
+            execute_batch(cur=cursor, sql=insert_query, argslist=tuples)
+            conn.commit()
+        except (Exception, DatabaseError): 
+            conn.rollback()
+            DB.__close(conn, cursor) 
+        DB.__close(conn, cursor)
+
+
+
+    @staticmethod
+    def all(sortBy: Sort | None = None, filters: List[Filter] = []) -> List[Car]:
         conn, cur = DB.__cursor()
         query = "SELECT * FROM cars"
 
@@ -43,7 +61,8 @@ class DB:
                     params.append(min)
                 case (col, min, max):
                     whereClauses.append(f"{col} >= %s AND {col} <= %s")
-                    params.append(min, max)
+                    params.append(min)
+                    params.append(max)
                 case (col, like):
                     whereClauses.append(f"{col} LIKE %s")
                     params.append(like)
