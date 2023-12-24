@@ -20,6 +20,9 @@ def extract_info(name):
 
 
 def import_cars() -> None:
+    # mark start
+    id = DB.mark_start_of_import()
+
     # Pagination
     name = []
     mileage = []
@@ -133,3 +136,5 @@ def import_cars() -> None:
     tuples = [tuple(x) for x in car_dealer.to_numpy()]
     cols = ", ".join(list(car_dealer.columns))
     DB.import_cars(tuples, cols)
+    if id:
+        DB.mark_end_of_import(id)

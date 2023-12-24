@@ -2,7 +2,7 @@ from psycopg2 import connect, DatabaseError
 from psycopg2.extensions import connection, cursor
 from psycopg2.extras import RealDictCursor, execute_batch
 from schemas import Car
-from typing import Any, List, Tuple, Literal
+from typing import Any, Dict, List, Tuple, Literal
 
 DATABASE_URL = "postgresql://postgres:postgres@db/scraper"
 
@@ -22,6 +22,55 @@ class DB:
     def __close(conn: connection, cur: cursor) -> None:
         cur.close()
         conn.close()
+
+
+    @staticmethod
+    def should_import() -> bool:
+        conn, cursor = DB.__cursor()
+
+        query = """
+            SELECT EXISTS(
+                SELECT id 
+                FROM car_import_jobs 
+                WHERE started_at >= current_date 
+                AND started_at < current_date + interval '1 day' 
+                AND finished_at IS NOT NULL
+            ) as exists"""
+        cursor.execute(query)
+        result = cursor.fetchone()
+        DB.__close(conn, cursor)
+        if result:
+            return not result["exists"] # type: ignore
+        return True
+
+    @staticmethod
+    def mark_start_of_import() -> int | None:
+        conn, cursor = DB.__cursor()
+
+        insert_query = "INSERT INTO car_import_jobs DEFAULT VALUES returning id;"
+        try:
+            cursor.execute(insert_query)
+            conn.commit()
+            result = cursor.fetchone()
+            if result:
+                return result['id'] # type: ignore
+        except (Exception, DatabaseError):
+            conn.rollback()
+        finally:
+            DB.__close(conn, cursor)
+
+    @staticmethod
+    def mark_end_of_import(id: int) -> None:
+        conn, cursor = DB.__cursor()
+
+        update_query = "UPDATE car_import_jobs SET finished_at = NOW() WHERE id = %s;"
+        try:
+            cursor.execute(update_query, [id])
+            conn.commit()
+        except (Exception, DatabaseError):
+            conn.rollback()
+        finally:
+            DB.__close(conn, cursor)
 
     @staticmethod
     def import_cars(tuples: List[Tuple[Any, ...]], columns: str) -> None:

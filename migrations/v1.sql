@@ -9,3 +9,9 @@ CREATE TABLE IF NOT EXISTS cars (
 	reviews INTEGER NOT NULL,
 	price INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS car_import_jobs (
+	id SERIAL PRIMARY KEY,
+	started_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
+	finished_at TIMESTAMP DEFAULT NULL
+)

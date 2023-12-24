@@ -11,7 +11,8 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def on_start():
-    demo.import_cars()
+    if DB.should_import():
+        demo.import_cars()
 
 
 @app.get("/")
@@ -26,6 +27,7 @@ def import_cars(background_tasks: BackgroundTasks) -> None:
 
 @app.get("/cars", response_model=list[Car])
 def get_all(
+    background_tasks: BackgroundTasks,
     brand: str | None = None,
     typename: str | None = None,
     year_min: int | None = None,
@@ -40,8 +42,10 @@ def get_all(
     price_min: int | None = None,
     price_max: int | None = None,
     sortBy: str | None = None,
-    orderAsc: bool = True,
+    orderAsc: bool = True
 ) -> list[Car]:
+    if DB.should_import():
+        background_tasks.add_task(demo.import_cars)
     filters: List[Filter] = [
         ("brand", brand),
         ("typename", typename),

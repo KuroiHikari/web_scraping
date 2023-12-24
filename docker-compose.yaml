@@ -13,6 +13,8 @@ services:
     environment:
       - PORT=80
     entrypoint: /start-reload.sh
+    depends_on: 
+      - db
   db:
     image: postgres
     restart: always
