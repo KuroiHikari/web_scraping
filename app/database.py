@@ -9,38 +9,33 @@ DATABASE_URL = "postgresql://postgres:postgres@db/scraper"
 Filter = Tuple[str, int | None, int | None] | Tuple[str, str | None]
 Sort = Tuple[str, Literal["ASC", "DESC"]]
 
+
 class DB:
     @staticmethod
     def __cursor() -> Tuple[connection, cursor]:
         conn = connect(
-            host="db",
-            database="scraper",
-            user="postgres",
-            password="postgres"
+            host="db", database="scraper", user="postgres", password="postgres"
         )
-        return conn, conn.cursor(cursor_factory=RealDictCursor) 
+        return conn, conn.cursor(cursor_factory=RealDictCursor)
 
-    @staticmethod 
-    def __close(conn: connection, cur: cursor) -> None: 
-        cur.close() 
+    @staticmethod
+    def __close(conn: connection, cur: cursor) -> None:
+        cur.close()
         conn.close()
-
 
     @staticmethod
     def import_cars(tuples: List[Tuple[Any, ...]], columns: str) -> None:
         conn, cursor = DB.__cursor()
         delete_query = "DELETE FROM cars WHERE 1=1"
-        insert_query = f"INSERT INTO cars({columns}) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)" 
+        insert_query = f"INSERT INTO cars({columns}) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
         try:
             cursor.execute(delete_query)
             execute_batch(cur=cursor, sql=insert_query, argslist=tuples)
             conn.commit()
-        except (Exception, DatabaseError): 
+        except (Exception, DatabaseError):
             conn.rollback()
-            DB.__close(conn, cursor) 
+            DB.__close(conn, cursor)
         DB.__close(conn, cursor)
-
-
 
     @staticmethod
     def all(sortBy: Sort | None = None, filters: List[Filter] = []) -> List[Car]:
@@ -68,7 +63,7 @@ class DB:
                     params.append(like)
 
         if whereClauses:
-            query = f"{query} WHERE {' AND '.join(whereClauses)}" 
+            query = f"{query} WHERE {' AND '.join(whereClauses)}"
 
         if sortBy:
             query = f"{query} ORDER BY {sortBy[0]} {sortBy[1]}"
@@ -80,4 +75,3 @@ class DB:
         DB.__close(conn, cur)
 
         return [Car.parse_obj(r) for r in res]
-

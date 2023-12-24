@@ -10,7 +10,7 @@ app = FastAPI()
 
 
 @app.on_event("startup")
-async def on_start(): 
+async def on_start():
     demo.import_cars()
 
 
@@ -26,21 +26,21 @@ def import_cars(background_tasks: BackgroundTasks) -> None:
 
 @app.get("/cars", response_model=list[Car])
 def get_all(
-    brand: str | None  = None,
-    typename: str | None  = None,
-    year_min: int | None  = None,
-    year_max: int | None  = None,
-    mileage_min: int | None  = None,
-    mileage_max: int | None  = None,
-    dealer: str | None  = None,
-    rating_min: int | None  = None,
-    rating_max: int | None  = None,
-    reviews_min: int | None  = None,
-    reviews_max: int | None  = None,
-    price_min: int | None  = None,
+    brand: str | None = None,
+    typename: str | None = None,
+    year_min: int | None = None,
+    year_max: int | None = None,
+    mileage_min: int | None = None,
+    mileage_max: int | None = None,
+    dealer: str | None = None,
+    rating_min: int | None = None,
+    rating_max: int | None = None,
+    reviews_min: int | None = None,
+    reviews_max: int | None = None,
+    price_min: int | None = None,
     price_max: int | None = None,
     sortBy: str | None = None,
-    orderAsc: bool = True
+    orderAsc: bool = True,
 ) -> list[Car]:
     filters: List[Filter] = [
         ("brand", brand),

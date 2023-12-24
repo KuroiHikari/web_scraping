@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from decimal import Decimal
 
+
 class Car(BaseModel):
     id: int
     brand: str
