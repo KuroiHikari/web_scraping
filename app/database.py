@@ -23,7 +23,6 @@ class DB:
         cur.close()
         conn.close()
 
-
     @staticmethod
     def should_import() -> bool:
         conn, cursor = DB.__cursor()
@@ -40,7 +39,7 @@ class DB:
         result = cursor.fetchone()
         DB.__close(conn, cursor)
         if result:
-            return not result["exists"] # type: ignore
+            return not result["exists"]  # type: ignore
         return True
 
     @staticmethod
@@ -52,7 +51,7 @@ class DB:
             cursor.execute(insert_query)
             conn.commit()
             result = cursor.fetchone()
-            return result['id'] if result else None # type: ignore
+            return result["id"] if result else None  # type: ignore
         except (Exception, DatabaseError):
             conn.rollback()
             return None

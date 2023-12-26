@@ -42,7 +42,7 @@ def get_all(
     price_min: int | None = None,
     price_max: int | None = None,
     sortBy: str | None = None,
-    orderAsc: bool = True
+    orderAsc: bool = True,
 ) -> list[Car]:
     if DB.should_import():
         background_tasks.add_task(demo.import_cars)
