@@ -52,10 +52,10 @@ class DB:
             cursor.execute(insert_query)
             conn.commit()
             result = cursor.fetchone()
-            if result:
-                return result['id'] # type: ignore
+            return result['id'] if result else None # type: ignore
         except (Exception, DatabaseError):
             conn.rollback()
+            return None
         finally:
             DB.__close(conn, cursor)
 
