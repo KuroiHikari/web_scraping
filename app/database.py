@@ -2,7 +2,7 @@ from psycopg2 import connect, DatabaseError
 from psycopg2.extensions import connection, cursor
 from psycopg2.extras import RealDictCursor, execute_batch
 from schemas import Car
-from typing import Any, Dict, List, Tuple, Literal
+from typing import Any, List, Tuple, Literal
 
 DATABASE_URL = "postgresql://postgres:postgres@db/scraper"
 
