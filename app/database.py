@@ -103,11 +103,11 @@ class DB:
                     whereClauses.append(f"{col} >= %s")
                     params.append(min)
                 case (col, min, max):
-                    whereClauses.append(f"{col} >= %s AND {col} <= %%%s%%")
+                    whereClauses.append(f"{col} >= %s AND {col} <= %s")
                     params.append(min)
                     params.append(max)
                 case (col, like):
-                    whereClauses.append(f"LOWER({col}) LIKE %s")
+                    whereClauses.append(f"LOWER({col}) LIKE %%%s%%")
                     params.append(like.lower())
 
         if whereClauses:
