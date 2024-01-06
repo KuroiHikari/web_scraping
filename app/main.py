@@ -53,7 +53,8 @@ def get_all(
     price_max: int | None = None,
     sortBy: str | None = None,
     orderAsc: bool = True,
-    limit: int = 30,
+    limit: int = 10,
+    offset: int = 0,
 ) -> list[Car]:
     if DB.should_import():
         background_tasks.add_task(demo.import_cars)
@@ -71,4 +72,4 @@ def get_all(
     order: Literal["ASC", "DESC"] = "ASC" if orderAsc else "DESC"
     sort: Sort | None = (sortBy, order) if sortBy else None
 
-    return DB.all(limit, sort, filters)
+    return DB.all(limit, offset, sort, filters)
