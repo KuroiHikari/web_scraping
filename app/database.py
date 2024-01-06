@@ -86,7 +86,7 @@ class DB:
         DB.__close(conn, cursor)
 
     @staticmethod
-    def all(sortBy: Sort | None = None, filters: List[Filter] = []) -> List[Car]:
+    def all(limit: int, sortBy: Sort | None = None, filters: List[Filter] = []) -> List[Car]:
         conn, cur = DB.__cursor()
         query = "SELECT * FROM cars"
 
@@ -116,7 +116,7 @@ class DB:
         if sortBy:
             query = f"{query} ORDER BY {sortBy[0]} {sortBy[1]}"
 
-        query = f"{query};"
+        query = f"{query} LIMIT {limit};"
 
         cur.execute(query, params)
         res = cur.fetchall()
